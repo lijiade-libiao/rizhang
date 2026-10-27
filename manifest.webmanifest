@@ -1,0 +1,35 @@
+{
+  "name": "日账 · 每日花销记录",
+  "short_name": "日账",
+  "description": "记录每日花销，每添加一笔自动累计当天总额。",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "background_color": "#f2ede4",
+  "theme_color": "#223128",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#223128">
+  <meta name="description" content="日账是一款轻量的每日花销记录工具，添加一笔就自动累计当天支出。">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="日账">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="format-detection" content="telephone=no">
+  <title>日账 · 每日花销记录</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#expenseForm">跳到记账</a>
+  <main class="app">
+    <h1 class="sr-only">日账 · 每日花销记录</h1>
+    <header class="topbar">
+      <div class="brand" aria-label="日账">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-copy">
+          <span class="brand-name">日账</span>
+          <span class="brand-tagline">每一笔，都算数</span>
+        </span>
+      </div>
+      <button class="round-button" id="dataButton" type="button" aria-label="数据与备份">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7.5h16M6.5 4.5h11A2.5 2.5 0 0 1 20 7v11a2.5 2.5 0 0 1-2.5 2.5h-11A2.5 2.5 0 0 1 4 18V7a2.5 2.5 0 0 1 2.5-2.5Z" />
+          <path d="M8 12h8M8 16h5" />
+        </svg>
+      </button>
+    </header>
+
+    <section class="date-nav" aria-label="选择记账日期">
+      <button class="nav-arrow" id="prevDate" type="button" aria-label="前一天">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 6-6 6 6 6" /></svg>
+      </button>
+      <label class="date-picker" for="dateInput">
+        <span class="date-relative" id="dateRelative">今天</span>
+        <span class="date-main">
+          <span class="date-full" id="dateFull">10月27日 星期二</span>
+          <svg class="date-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 3v3M17 3v3M4.5 9h15M6.5 5h11A2.5 2.5 0 0 1 20 7.5v10A2.5 2.5 0 0 1 17.5 20h-11A2.5 2.5 0 0 1 4 17.5v-10A2.5 2.5 0 0 1 6.5 5Z" />
+          </svg>
+        </span>
+        <input id="dateInput" type="date" aria-label="选择日期">
+      </label>
+      <button class="nav-arrow" id="nextDate" type="button" aria-label="后一天">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 6 6 6-6 6" /></svg>
+      </button>
+    </section>
+
+    <section class="summary-card" aria-labelledby="summaryLabel">
+      <span class="summary-orbit" aria-hidden="true"></span>
+      <span class="summary-sun" aria-hidden="true"></span>
+      <div class="summary-top">
+        <span class="summary-label" id="summaryLabel">今日支出</span>
+        <span class="count-pill"><span id="dayCount">0</span> 笔</span>
+      </div>
+      <div class="total-row" id="totalRow" aria-live="polite" aria-label="今日支出 0.00 元">
+        <span class="currency" aria-hidden="true">¥</span>
+        <span class="total-number" aria-hidden="true"><span id="totalMajor">0</span><span class="total-decimal" id="totalMinor">.00</span></span>
+      </div>
+      <div class="summary-bottom">
+        <div class="summary-stat">
+          <span>当月累计</span>
+          <strong id="monthTotal">¥0.00</strong>
+        </div>
+        <div class="summary-divider" aria-hidden="true"></div>
+        <div class="summary-stat summary-stat--right">
+          <span>当月记录</span>
+          <strong id="monthCount">0 笔</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="composer-card" aria-labelledby="composerTitle">
+      <div class="composer-heading">
+        <div>
+          <span class="eyebrow">QUICK ENTRY</span>
+          <h2 id="composerTitle">记一笔</h2>
+        </div>
+        <span class="auto-sum"><span class="auto-sum-dot" aria-hidden="true"></span>自动累计</span>
+      </div>
+
+      <form id="expenseForm" novalidate>
+        <label class="amount-field" for="amountInput">
+          <span class="amount-symbol" aria-hidden="true">¥</span>
+          <input id="amountInput" name="amount" type="text" inputmode="decimal" autocomplete="off" enterkeyhint="done" maxlength="12" placeholder="0.00" aria-describedby="amountError" aria-label="花销金额">
+          <span class="amount-unit" aria-hidden="true">元</span>
+        </label>
+        <p class="field-error" id="amountError" hidden>请输入大于 0 的金额</p>
+
+        <div class="quick-row" aria-label="快捷金额">
+          <span class="quick-label">快捷</span>
+          <button type="button" data-quick="10">+10</button>
+          <button type="button" data-quick="20">+20</button>
+          <button type="button" data-quick="50">+50</button>
+          <button type="button" data-quick="100">+100</button>
+        </div>
+
+        <label class="text-field" for="noteInput">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5h10A2.5 2.5 0 0 1 19.5 7v10a2.5 2.5 0 0 1-2.5 2.5H7A2.5 2.5 0 0 1 4.5 17V7A2.5 2.5 0 0 1 7 4.5ZM8 9h8M8 13h5" /></svg>
+          <input id="noteInput" name="note" type="text" maxlength="40" autocomplete="off" placeholder="花在哪里？选填" aria-label="花销备注">
+        </label>
+
+        <fieldset class="category-fieldset">
+          <legend>分类</legend>
+          <div class="category-options" id="addCategories" role="group" aria-label="花销分类"></div>
+        </fieldset>
+
+        <button class="submit-button" type="submit">
+          <span class="submit-icon" aria-hidden="true">+</span>
+          <span>加入账本</span>
+          <span class="submit-shortcut" aria-hidden="true">自动合计</span>
+        </button>
+      </form>
+    </section>
+
+    <section class="ledger-section" aria-labelledby="ledgerTitle">
+      <div class="section-heading">
+        <div>
+          <span class="eyebrow">DETAILS</span>
+          <h2 id="ledgerTitle">当日明细</h2>
+        </div>
+        <span class="section-total" id="listTotal">¥0.00</span>
+      </div>
+      <div class="expense-list" id="expenseList"></div>
+    </section>
+
+    <section class="week-card" aria-labelledby="weekTitle">
+      <div class="section-heading section-heading--week">
+        <div>
+          <span class="eyebrow">RECENT 7 DAYS</span>
+          <h2 id="weekTitle">近 7 天</h2>
+        </div>
+        <span class="week-total" id="weekTotal">共 ¥0.00</span>
+      </div>
+      <div class="week-chart" id="weekChart"></div>
+      <p class="week-hint">点选柱形，切换日期查看明细</p>
+    </section>
+
+    <footer class="app-footer">
+      <p><span class="status-dot" aria-hidden="true"></span>数据保存在当前浏览器中</p>
+      <button type="button" id="footerDataButton">备份数据</button>
+    </footer>
+  </main>
+
+  <dialog class="modal" id="editDialog" aria-labelledby="editTitle">
+    <form class="sheet" id="editForm" novalidate>
+      <span class="sheet-grabber" aria-hidden="true"></span>
+      <div class="sheet-heading">
+        <div>
+          <span class="eyebrow">EDIT ENTRY</span>
+          <h2 id="editTitle">修改记录</h2>
+        </div>
+        <button class="close-button" type="button" data-close-dialog aria-label="关闭">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+        </button>
+      </div>
+
+      <label class="amount-field amount-field--compact" for="editAmount">
+        <span class="amount-symbol" aria-hidden="true">¥</span>
+        <input id="editAmount" type="text" inputmode="decimal" autocomplete="off" maxlength="12" aria-label="修改金额" aria-describedby="editAmountError">
+        <span class="amount-unit" aria-hidden="true">元</span>
+      </label>
+      <p class="field-error" id="editAmountError" hidden>请输入大于 0 的金额</p>
+
+      <div class="edit-grid">
+        <label class="text-field text-field--stacked" for="editNote">
+          <span>备注</span>
+          <input id="editNote" type="text" maxlength="40" autocomplete="off" placeholder="选填">
+        </label>
+        <label class="text-field text-field--stacked" for="editDate">
+          <span>日期</span>
+          <input id="editDate" type="date">
+        </label>
+      </div>
+
+      <fieldset class="category-fieldset category-fieldset--edit">
+        <legend>分类</legend>
+        <div class="category-options" id="editCategories" role="group" aria-label="修改花销分类"></div>
+      </fieldset>
+
+      <div class="sheet-actions">
+        <button class="delete-button" id="deleteEntry" type="button">删除</button>
+        <button class="submit-button submit-button--compact" type="submit">保存修改</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="dataDialog" aria-labelledby="dataTitle">
+    <div class="sheet">
+      <span class="sheet-grabber" aria-hidden="true"></span>
+      <div class="sheet-heading">
+        <div>
+          <span class="eyebrow">YOUR DATA</span>
+          <h2 id="dataTitle">数据与备份</h2>
+        </div>
+        <button class="close-button" type="button" data-close-dialog aria-label="关闭">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+        </button>
+      </div>
+
+      <div class="data-stats">
+        <div><strong id="dataRecordCount">0</strong><span>笔记录</span></div>
+        <div><strong id="dataDayCount">0</strong><span>个记账日</span></div>
+      </div>
+
+      <p class="data-note">所有账目只保存在这台设备的浏览器里。更换手机、清理浏览器数据前，请先导出一份备份。</p>
+
+      <div class="data-actions">
+        <button class="action-row" id="exportButton" type="button">
+          <span class="action-icon action-icon--accent" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 3v12M7.5 10.5 12 15l4.5-4.5M5 19h14" /></svg>
+          </span>
+          <span><strong>导出备份</strong><small>保存为 JSON 文件</small></span>
+          <span class="row-chevron" aria-hidden="true">›</span>
+        </button>
+        <button class="action-row" id="importButton" type="button">
+          <span class="action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 16V4M7.5 8.5 12 4l4.5 4.5M5 19h14" /></svg>
+          </span>
+          <span><strong>导入备份</strong><small>合并已有记录，不会覆盖</small></span>
+          <span class="row-chevron" aria-hidden="true">›</span>
+        </button>
+        <button class="action-row" id="installButton" type="button" hidden>
+          <span class="action-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 3v12M7.5 10.5 12 15l4.5-4.5M5 19h14" /></svg>
+          </span>
+          <span><strong>添加到桌面</strong><small>像 App 一样打开</small></span>
+          <span class="row-chevron" aria-hidden="true">›</span>
+        </button>
+      </div>
+
+      <details class="install-guide">
+        <summary>怎么添加到手机桌面？</summary>
+        <p>iPhone：用 Safari 打开后点“分享” → “添加到主屏幕”。<br>Android：在 Chrome 菜单中选择“添加到主屏幕”或“安装应用”。</p>
+      </details>
+
+      <button class="clear-button" id="clearDataButton" type="button">清空全部记录</button>
+      <input id="importFile" type="file" accept=".json,application/json" hidden>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script src="./app.js" defer></script>
+</body>
+</html>
+  </main>
+</body>
+</html>
